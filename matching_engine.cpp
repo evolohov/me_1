@@ -325,8 +325,7 @@ void step(book_state& b, const command& cmd, std::vector<event_t>& ev)
 }
 
 // order-level snapshot of one side, in exact matching priority.
-// Copy the live entries and sort with the SAME comparator the heap uses, so
-// the printed order is by definition the order in which they would fill.
+// Copy the live entries and sort with the SAME comparator the heap uses, so  the printed order is by definition the order in which they would fill.
 // std::sort is not stable, but with a strict total order stability is moot.
 template <class P> std::vector<resting_order_view> ordered_side(const book_state& b, const side_heap<P>& h) 
 {
@@ -519,8 +518,7 @@ std::optional<std::string> check_consistency(const engine_state& s)
     return resting_bids != live_bids || resting_asks != live_asks? std::optional<std::string>("resting orders vs live heap entries mismatch"): std::nullopt;
 }
 
-// Stable names. Kept here (not in the CLI) so any future front end -- FIX
-// gateway, market data publisher, tests -- prints identical tokens.
+// Stable names. Kept here (not in the CLI) for printed strings consistency
 const char* to_string(order_side v)    { return v == order_side::buy    ? "BUY"   : "SELL"; }
 const char* to_string(order_type v)    { return v == order_type::limit  ? "LIMIT" : "MARKET"; }
 const char* to_string(time_in_force v) { return v == time_in_force::GTC ? "GTC"   : "IOC"; }

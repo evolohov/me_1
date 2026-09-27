@@ -1,44 +1,7 @@
-// =============================================================================
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // matching_engine.hpp
-//
-// A single-instrument continuous limit order book with price-time priority.
-//
-// ARCHITECTURE IN ONE PARAGRAPH
-// -----------------------------
-// The engine is a *pure state-transition function*:
-//
-//        (engine_state, Command)  ->  (engine_state', [event_t...])
-//
-// Everything the engine knows lives in engine_state. There are no globals, no
-// clocks, no random numbers, no I/O and no threads inside the engine. That is
-// what makes requirement #4 (deterministic fills) hold *by construction*
-// rather than by testing alone: if the function only depends on its inputs,
-// the same inputs must yield the same outputs. The CLI, file replay, journal
-// persistence, etc. are all thin shells around that function.
-//
-// WHY THIS SHAPE (and not an object with methods and callbacks)?
-//   * Determinism is trivial to reason about: state in, state out.
-//   * Replay / event-sourcing is a left fold over the input log.
-//   * Testing needs no mocks: feed commands, compare the event list.
-//   * Tradeoff: a naive pure function would copy the whole book on every call.
-//     We avoid that by taking the state *by value* so callers can std::move it
-//     in (O(1), no copy) -- see apply() below. Callers who want the old state
-//     preserved (e.g. "what-if" simulation) can pass a copy explicitly and pay
-//     for it only when they need it.
-//
-// MULTI-INSTRUMENT FUTURE
-// -----------------------
-// Every per-instrument piece of state is isolated in book_state. engine_state
-// currently wraps exactly one book_state. To go multi-symbol:
-//   1. add `std::string symbol` to new_order/cancel_order,
-//   2. turn engine_state into `std::map<Symbol, book_state>` (std::map, not
-//      unordered_map, so iteration for snapshots is deterministic),
-//   3. add an engine-level `OrderId -> Symbol` index so CANCEL-by-id can be
-//      routed without the caller supplying the symbol, and move the
-//      duplicate-id check to that index (ids should be unique engine-wide).
-// Nothing in the matching logic itself needs to change, because the matching
-// functions only ever touch one book_state.
-// =============================================================================
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 #pragma once
 
 #include <algorithm>
