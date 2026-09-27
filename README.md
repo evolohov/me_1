@@ -5,7 +5,7 @@ The engine is a *pure state-transition function*:
 `(engine_state, Command)  ->  (engine_state', [event_t...])`
 
 Everything the engine knows lives in engine_state. There are no globals, no clocks, no random numbers, no I/O and no threads inside the engine. That is
-what makes requirement #4 (deterministic fills) hold *by construction* rather than by testing alone: if the function only depends on its inputs,
+what makes it deterministic *by construction* rather than by testing alone: if the function only depends on its inputs,
 the same inputs must yield the same outputs. The CLI, file replay, journal  persistence, etc. are all thin shells around that function.
 Use min heap for `sell` order book and max heap for `buy` order book. Standard approach with `std::map<Price, std::deque<Order>>` would be more suitable
 for production, but I want to see what can be done with heaps and going to use it later 
