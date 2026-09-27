@@ -1,0 +1,21 @@
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 02 PARTIAL FILLS
+# A resting GTC order that is partially filled keeps its original queue # position (same seq), even while later orders join the same price.
+# An incoming GTC order that partially fills rests the remainder at the back of the queue at its limit price.
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PLACE 1 A SELL LIMIT 100 10 GTC
+PLACE 2 B SELL LIMIT 100 10 GTC
+PLACE 3 X BUY LIMIT 100 3 GTC       # #1 -> leaves 7, still first in queue
+STATUS 1
+PLACE 4 C SELL LIMIT 100 5 GTC      # joins behind #1 and #2
+DEPTH ORDERS
+PLACE 5 Y BUY LIMIT 100 3 GTC       # #1 again (priority retained) -> leaves 4
+DEPTH ORDERS
+PLACE 6 Z BUY LIMIT 100 12 GTC      # #1 4 (filled), #2 8 (leaves 2)
+DEPTH ORDERS
+STATUS 1
+STATUS 2
+# Incoming partial: 10 wanted, only 2 (#2) + 5 (#4) available -> 3 rests as a bid.
+PLACE 7 W BUY LIMIT 100 10 GTC
+STATUS 7
+TOP

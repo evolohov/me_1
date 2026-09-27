@@ -1,0 +1,34 @@
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 04 SELF-TRADE PREVENTION (all three policies)
+# A trade between two orders of the same account must never print.
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# --- CANCEL_INCOMING (default) ---
+PLACE 1 A SELL LIMIT 100 5 GTC
+PLACE 2 B SELL LIMIT 100 5 GTC
+# A's buy would hit A's own #1 first -> incoming cancelled, NO trade, and B's
+# #2 is NOT traded through either (that would jump #1's priority).
+PLACE 3 A BUY LIMIT 100 10 GTC
+DEPTH ORDERS
+# STP after partial execution: #4 (C) is better priced so #5 trades with it
+# first, then reaches A's own #1 -> the remaining 8 is cancelled.
+PLACE 4 C SELL LIMIT 99 2 GTC
+PLACE 5 A BUY LIMIT 100 10 GTC
+STATUS 5
+# Own order that is NOT reachable is not a self-trade: A bids 98, A's ask is 100.
+PLACE 6 A BUY LIMIT 98 1 GTC
+DEPTH ORDERS
+# --- CANCEL_RESTING ---
+CONFIG STP CANCEL_RESTING
+# #7 hits A's #1 -> #1 cancelled, matching continues with B's #2 (5@100),
+# remaining 5 rests at 100.
+PLACE 7 A BUY LIMIT 100 10 GTC
+DEPTH ORDERS
+# --- CANCEL_BOTH ---
+CONFIG STP CANCEL_BOTH
+# #8 (A) would hit A's bid #7 first -> both cancelled; A's #6 at 98 untouched.
+PLACE 8 A SELL LIMIT 98 3 GTC
+DEPTH ORDERS
+# Market orders are subject to STP too.
+CONFIG STP CANCEL_INCOMING
+PLACE 9 A SELL MARKET 0 1 IOC
+STATUS 6

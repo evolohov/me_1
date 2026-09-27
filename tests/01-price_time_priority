@@ -1,0 +1,25 @@
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 01 PRICE-TIME PRIORITY
+# Price first: a better price always fills first, regardless of arrival. Time second: at the same price, the earlier order (lower seq) fills first.
+# Also shows price improvement: trades print at the RESTING order's price.
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PLACE 1 A SELL LIMIT 101 10 GTC
+PLACE 2 B SELL LIMIT 100 10 GTC     # arrives later but better price
+PLACE 3 C SELL LIMIT 100 10 GTC     # same price as #2, later -> behind #2
+PLACE 4 D SELL LIMIT 102 10 GTC
+DEPTH ORDERS
+# Buy 25 up to 101. Expected fill order: #2 (10@100), #3 (10@100), #1 (5@101).
+# #4 at 102 is not reached.
+PLACE 5 E BUY LIMIT 101 25 GTC
+DEPTH ORDERS
+TOP
+# Mirror on the bid side: #6 and #7 at 99, #8 at 98, #9 at 99 (latest at 99).
+PLACE 6 F BUY LIMIT 99 5 GTC
+PLACE 7 G BUY LIMIT 99 5 GTC
+PLACE 8 H BUY LIMIT 98 5 GTC
+PLACE 9 I BUY LIMIT 99 5 GTC
+DEPTH ORDERS
+# Sell 12 down to 98. Expected: #6 5@99, #7 5@99, #9 2@99. #8 (98) untouched
+# because 99-level liquidity is exhausted first by price priority.
+PLACE 10 J SELL LIMIT 98 12 GTC
+DEPTH

@@ -7,10 +7,7 @@ SRC      := matching_engine.cpp cli.cpp
 me: $(SRC) matching_engine.hpp
 	$(CXX) $(CXXFLAGS) -Iinclude $(SRC) -o $@
 
-test: me
-	./tests/run_tests.sh ./me
-
 clean:
-	rm -f me me_asan
+	rm -f me 
 
 .PHONY: test clean

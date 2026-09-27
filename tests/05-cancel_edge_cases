@@ -1,0 +1,45 @@
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 05 CANCEL EDGE CASES (including "cancel during match")
+# The engine is single-threaded and each command is atomic, so a cancel can
+# never interleave with a match; it is sequenced before or after. What must
+# work is the lazy-deletion machinery the heap relies on.
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PLACE 1 A SELL LIMIT 100 5 GTC
+PLACE 2 B SELL LIMIT 100 5 GTC
+PLACE 3 C SELL LIMIT 100 5 GTC
+PLACE 4 D SELL LIMIT 101 5 GTC
+# Cancelling the best order: top of book must move to #2 immediately.
+CANCEL 1
+TOP
+# Cancelling from the MIDDLE of the heap: #3 becomes a buried tombstone.
+CANCEL 3
+DEPTH ORDERS
+# An aggressor sweeping the book must skip the tombstone mid-match:
+# expect #2 5@100 then #4 3@101 -- never #3.
+PLACE 5 X BUY LIMIT 101 8 GTC
+# Cancel after a partial fill cancels only the leaves (2), fills stand.
+CANCEL 4
+STATUS 4
+# Rejections:
+CANCEL 2          # fully filled   -> ALREADY_FILLED
+CANCEL 1          # double cancel  -> ALREADY_CANCELLED
+CANCEL 999        # never existed  -> UNKNOWN_ORDER
+PLACE 1 A BUY LIMIT 90 1 GTC     # ids are never reusable -> DUPLICATE_ORDER_ID
+# "Cancel arriving while the order is being matched": the aggressor (#7) is
+# sequenced first and fills #6 completely; the cancel, sequenced next, is
+# too late. Output is the same on every replay.
+PLACE 6 E SELL LIMIT 102 5 GTC
+PLACE 7 F BUY LIMIT 102 5 GTC
+CANCEL 6
+# Same race, other order: cancel first, then aggressor finds nothing and rests.
+PLACE 8 E SELL LIMIT 103 5 GTC
+CANCEL 8
+PLACE 9 F BUY LIMIT 103 5 GTC
+# An order cancelled BY the match itself (STP cancel-resting) is terminal.
+CONFIG STP CANCEL_RESTING
+PLACE 10 G SELL LIMIT 104 5 GTC
+PLACE 11 F SELL LIMIT 103 1 GTC   # F's own bid #9 at 103 -> STP cancels #9, #11 rests
+CANCEL 9
+CANCEL 11
+TOP
+DEPTH ORDERS

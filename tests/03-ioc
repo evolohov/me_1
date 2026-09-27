@@ -1,0 +1,24 @@
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 03 IMMEDIATE-OR-CANCEL
+# IOC matches what it can immediately; any remainder is cancelled and it never rests on the book.
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PLACE 1 A SELL LIMIT 100 5 GTC
+PLACE 2 B SELL LIMIT 101 5 GTC
+# Partial IOC: 5@100 fills, 101 is beyond the limit -> 3 cancelled.
+PLACE 3 C BUY LIMIT 100 8 IOC
+STATUS 3
+DEPTH
+# Non-marketable IOC: nothing fills, all cancelled, book unchanged.
+PLACE 4 C BUY LIMIT 99 5 IOC
+STATUS 4
+# Fully filled IOC: no cancel event at all.
+PLACE 5 D BUY LIMIT 101 5 IOC
+STATUS 5
+# IOC sweeping several levels.
+PLACE 6 E BUY LIMIT 50 4 GTC
+PLACE 7 F BUY LIMIT 49 4 GTC
+PLACE 8 G SELL LIMIT 49 10 IOC      # 4@50, 4@49, 2 cancelled
+TOP
+# An IOC is never cancellable afterwards: it is already terminal.
+CANCEL 3
+CANCEL 5
