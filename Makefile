@@ -7,10 +7,6 @@ SRC      := matching_engine.cpp cli.cpp
 me: $(SRC) matching_engine.hpp
 	$(CXX) $(CXXFLAGS) -Iinclude $(SRC) -o $@
 
-# Debug build with AddressSanitizer + UndefinedBehaviorSanitizer.
-me_asan: $(SRC) matching_engine.hpp
-	$(CXX) -std=c++17 -g -O1 -fsanitize=address,undefined -Iinclude $(SRC) -o $@
-
 test: me
 	./tests/run_tests.sh ./me
 
