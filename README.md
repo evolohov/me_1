@@ -14,7 +14,7 @@ for production, but I want to see what can be done with heaps and going to use i
 * Replay/event-sourcing is a left fold over the input log.
 * Testing needs no mocks: feed commands, compare the event list.
 * Tradeoff: a naive pure function would copy the whole book on every call. avoiding that by taking the state *by value* so callers can std::move it
-   in (O(1), no copy) -- see apply() below. Callers who want the old state  preserved (e.g. "what-if" simulation) can pass a copy explicitly 
+   in (O(1), no copy) -- see apply() sporce code. 
 
 
 ## Key decisions and tradeoffs (details are in the source comments)
